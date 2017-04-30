@@ -1,5 +1,6 @@
 package interviewmaster.admin.interview.com.androidex;
 
+import android.content.ClipData;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -13,8 +14,8 @@ import org.json.JSONObject;
 
 import java.nio.channels.DatagramChannel;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-
 
 
 public class SqliteDatabase extends SQLiteOpenHelper {
@@ -60,7 +61,10 @@ public class SqliteDatabase extends SQLiteOpenHelper {
                         values.put(DbVari.NATIONALITY, employee.getNationality());
                         values.put(DbVari.LANGUAGE, employee.getLanguage());
                         values.put(DbVari.IMAGEURL, employee.getImageURL());
-                        values.put(DbVari.SKILL, employee.getSkills() != null ? employee.getSkills().toString() : null);
+                        //values.put(DbVari.SKILL, employee.getSkills() != null ? employee.getSkills().toString() : null);
+                        values.put(DbVari.TECHNICALSKILL, employee.getSkills().get(0).getTechnical().toString().replace("[", "").replace("]", ""));
+                        values.put(DbVari.EXTRACURRICULAR, employee.getSkills().get(0).getExtraCurricular().toString().replace("[", "").replace("]", ""));
+
                         db.insertWithOnConflict(DbVari.TABLE_NAME, null, values, SQLiteDatabase.CONFLICT_REPLACE);
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -85,11 +89,12 @@ public class SqliteDatabase extends SQLiteOpenHelper {
                 employeeList = new ArrayList<Employee>();
                 exampleList = new ArrayList<Example>();
 
-                if (cursor.moveToFirst()) {
+                while (cursor.moveToNext()) {
                     Employee item = new Employee();
                     item.setId(cursor.getString(cursor.getColumnIndex(DbVari.ID)));
                     item.setFirstName(cursor.getString(cursor.getColumnIndex(DbVari.FIRSTNAME)));
                     item.setLastName(cursor.getString(cursor.getColumnIndex(DbVari.LASTNAME)));
+                    item.setImageURL(cursor.getString(cursor.getColumnIndex(DbVari.IMAGEURL)));
                     item.setAddress(cursor.getString(cursor.getColumnIndex(DbVari.ADDRESS)));
                     item.setCity(cursor.getString(cursor.getColumnIndex(DbVari.CITY)));
                     item.setZipcode(cursor.getString(cursor.getColumnIndex(DbVari.ZIPCODE)));
@@ -99,7 +104,16 @@ public class SqliteDatabase extends SQLiteOpenHelper {
                     item.setEmail(cursor.getString(cursor.getColumnIndex(DbVari.EMAIL)));
                     item.setNationality(cursor.getString(cursor.getColumnIndex(DbVari.NATIONALITY)));
                     item.setLanguage(cursor.getString(cursor.getColumnIndex(DbVari.LANGUAGE)));
-                   // String sklildata = cursor.getString(cursor.getColumnIndex(DbVari.SKILL));
+                    Skill skill = new Skill();
+                    List<Skill> skills = new ArrayList<>();
+                    skill.setTechnical(Arrays.asList(cursor.getString(cursor.getColumnIndex(DbVari.TECHNICALSKILL)).split(",")));
+                    skill.setExtraCurricular(Arrays.asList(cursor.getString(cursor.getColumnIndex(DbVari.EXTRACURRICULAR)).split(",")));
+                    skills.add(skill);
+                    item.setSkills(skills);
+
+
+                    // String sklildata = cursor.getString(cursor.getColumnIndex(DbVari.SKILL));
+/*
                     if (cursor.getString(cursor.getColumnIndex(DbVari.SKILL) )!= null) {
 
                         try {
@@ -140,6 +154,7 @@ public class SqliteDatabase extends SQLiteOpenHelper {
                             e.printStackTrace();
                         }
                     }
+*/
                     employeeList.add(item);
                 }
                 while (cursor.moveToNext()) ;
@@ -157,6 +172,59 @@ public class SqliteDatabase extends SQLiteOpenHelper {
 
         return exampleList;
     }
+
+    public List<Example> getuser(int id) {
+        SQLiteDatabase ser = this.getReadableDatabase();
+        Employee item = new Employee();
+        List<Example> exampleList = null;
+        List<Employee> employeeList = null;
+
+        try {
+            String Query = "SELECT * FROM " + DbVari.TABLE_NAME + " WHERE " + DbVari.ID + " = '" + id + "'";
+            Cursor cursor = ser.rawQuery(Query, null);
+            if (cursor.isLast()) {
+                while (cursor.moveToNext()) {
+                    item.setId(cursor.getString(cursor.getColumnIndex(DbVari.ID)));
+                    item.setFirstName(cursor.getString(cursor.getColumnIndex(DbVari.FIRSTNAME)));
+                    item.setLastName(cursor.getString(cursor.getColumnIndex(DbVari.LASTNAME)));
+                    item.setImageURL(cursor.getString(cursor.getColumnIndex(DbVari.IMAGEURL)));
+                    item.setAddress(cursor.getString(cursor.getColumnIndex(DbVari.ADDRESS)));
+                    item.setCity(cursor.getString(cursor.getColumnIndex(DbVari.CITY)));
+                    item.setZipcode(cursor.getString(cursor.getColumnIndex(DbVari.ZIPCODE)));
+                    item.setGender(cursor.getString(cursor.getColumnIndex(DbVari.GENDER)));
+                    item.setDob(cursor.getString(cursor.getColumnIndex(DbVari.DOB)));
+                    item.setMobile(cursor.getString(cursor.getColumnIndex(DbVari.MOBILE)));
+                    item.setEmail(cursor.getString(cursor.getColumnIndex(DbVari.EMAIL)));
+                    item.setNationality(cursor.getString(cursor.getColumnIndex(DbVari.NATIONALITY)));
+                    item.setLanguage(cursor.getString(cursor.getColumnIndex(DbVari.LANGUAGE)));
+                    Skill skill = new Skill();
+                    List<Skill> skills = new ArrayList<>();
+                    skill.setTechnical(Arrays.asList(cursor.getString(cursor.getColumnIndex(DbVari.TECHNICALSKILL)).split(",")));
+                    skill.setExtraCurricular(Arrays.asList(cursor.getString(cursor.getColumnIndex(DbVari.EXTRACURRICULAR)).split(",")));
+                    skills.add(skill);
+                    item.setSkills(skills);
+                }
+                employeeList.add(item);
+
+
+            }
+            while (cursor.moveToNext()) ;
+            Example example = new Example();
+            example.setEmployee(employeeList);
+            if (exampleList != null) {
+                exampleList.add(example);
+            }
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            ser.close();
+        }
+        return exampleList;
+    }
+
+
 }
 
 

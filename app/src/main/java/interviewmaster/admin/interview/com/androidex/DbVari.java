@@ -20,7 +20,9 @@ public class DbVari {
     public static final String NATIONALITY="nationality";
     public static final String LANGUAGE="languge";
     public static final String IMAGEURL="imageurl";
-    public static final String SKILL="skill";
+    public static final String TECHNICALSKILL="technicalskill";
+    public static final String EXTRACURRICULAR="extracurricular";
+
 
   /*  static String CREATETABLE="CREATE TABLE IF NOT EXISTS "+TABLE_NAME
             +"("+ID+" TEXT,"
@@ -56,7 +58,8 @@ public class DbVari {
             + NATIONALITY + " TEXT,"
             + LANGUAGE + " TEXT,"
             + IMAGEURL + " TEXT,"
-            + SKILL + " TEXT"
+            + TECHNICALSKILL + " TEXT,"
+            + EXTRACURRICULAR + " TEXT"
             +")";
 
 }

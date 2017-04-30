@@ -54,13 +54,22 @@ public class RetroAdapter extends RecyclerView.Adapter<RetroAdapter.Myview> {
 
     @Override
     public void onBindViewHolder(Myview holder, int position) {
-
+        StringBuilder stringBuilder=new StringBuilder();
+        StringBuilder stringBuilder1=new StringBuilder();
 
         Employee item = examples.get(0).getEmployee().get(position);
 
 //        Log.d("u",item.getImageURL());
-        holder.textView.setText(item.getFirstName());
-        holder.textView2.setText(item.getLastName());
+
+        for(int gh=0;gh<item.getSkills().get(0).getExtraCurricular().size();gh++){
+            stringBuilder1.append(item.getSkills().get(0).getExtraCurricular().get(gh));
+            holder.textView.setText(stringBuilder1);
+        }
+
+        for (int m = 0; m < item.getSkills().get(0).getTechnical().size(); m++) {
+            stringBuilder.append(item.getSkills().get(0).getTechnical().get(m));
+            holder.textView2.setText(stringBuilder);
+        }
         Picasso.with(c).load(item.getImageURL()).into(holder.imageView);
 
 
